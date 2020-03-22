@@ -87,8 +87,8 @@ class SearchViewController: UIViewController, UISearchBarDelegate, UISearchDispl
             let vc = nc.topViewController as! DetailViewController
             
             // contextをAddTaskViewController.swiftのcontextへ渡す
-            let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
-            vc.context = context
+//            let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+//            vc.context = context
 
             if let indexPath = indexPath{
                 vc.detailData = self.searchData[indexPath.row]
@@ -108,33 +108,33 @@ class SearchViewController: UIViewController, UISearchBarDelegate, UISearchDispl
         //検索結果配列を空にする。
         searchData.removeAll()
 
-        if(searchText != ""){
-            // AppDelegateクラスのインスタンスを取得
-            let appDelegate = UIApplication.shared.delegate as! AppDelegate
-            let context = appDelegate.persistentContainer.viewContext
-            //%@はstring型を表す
-            let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Memo")
-            //複数条件かつ部分一致でじ検索
-            let predicate = NSCompoundPredicate(type: NSCompoundPredicate.LogicalType.or
-                , subpredicates: [
-                    NSPredicate(format: "%K CONTAINS %@","company", "\(searchText)"),
-                    NSPredicate(format: "%K CONTAINS %@", "title","\(searchText)"),
-                    ])
-            fetchRequest.predicate = predicate
-            
-            let fetchData = try! context.fetch(fetchRequest)
-
-            if(!fetchData.isEmpty){
-                for i in 0..<fetchData.count{
-                    searchData.append(fetchData[i] as! Memo)
-                }
-                do{
-                    try context.save()
-                }catch{
-                    print(error)
-                }
-            }
-        }
+//        if(searchText != ""){
+//            // AppDelegateクラスのインスタンスを取得
+//            let appDelegate = UIApplication.shared.delegate as! AppDelegate
+//            let context = appDelegate.persistentContainer.viewContext
+//            //%@はstring型を表す
+//            let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Memo")
+//            //複数条件かつ部分一致でじ検索
+//            let predicate = NSCompoundPredicate(type: NSCompoundPredicate.LogicalType.or
+//                , subpredicates: [
+//                    NSPredicate(format: "%K CONTAINS %@","company", "\(searchText)"),
+//                    NSPredicate(format: "%K CONTAINS %@", "title","\(searchText)"),
+//                    ])
+//            fetchRequest.predicate = predicate
+//
+//            let fetchData = try! context.fetch(fetchRequest)
+//
+//            if(!fetchData.isEmpty){
+//                for i in 0..<fetchData.count{
+//                    searchData.append(fetchData[i] as! Memo)
+//                }
+//                do{
+//                    try context.save()
+//                }catch{
+//                    print(error)
+//                }
+//            }
+//        }
         resultTableView.reloadData()
     }
     

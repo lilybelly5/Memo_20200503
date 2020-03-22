@@ -26,7 +26,7 @@ class ViewController: UIViewController, UITextFieldDelegate,UITextViewDelegate {
     //resultDateで１日前を日付計算
     var resultDate:Date?
     //MemoTableViewConrtollerから引き渡されたcontext
-    var context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+//    var context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
     
 
 /*
@@ -134,28 +134,28 @@ class ViewController: UIViewController, UITextFieldDelegate,UITextViewDelegate {
 
             // 編集の場合は詳細画面から渡されたself.memoを変更、
             // 新規の場合は新しいMemoオブジェクトを作り、現在の日時を入れる_
-            let memo: Memo = {
-                if let memo = self.memo {
-                    memo.createdAt = Date()
-                    memo.alertDate = self.resultDate
-                    return memo
-                } else {
-                    let memo = Memo(context: self.context)
-                    memo.createdAt = Date()
-                    memo.alertDate = self.resultDate
-                    return memo
-                }
-            }()
-            
-            memo.title = self.titleField.text
-            memo.company = self.companyField.text
-            memo.memoText = self.memoTextView.text
-            memo.memoNum = self.memoNumLabel.text
-            memo.memoDate = self.dateField.text
-            memo.alertDate = self.resultDate
+//            let memo: Memo = {
+//                if let memo = self.memo {
+//                    memo.createdAt = Date()
+//                    memo.alertDate = self.resultDate
+//                    return memo
+//                } else {
+////                    let memo = Memo(context: self.context)
+////                    memo.createdAt = Date()
+////                    memo.alertDate = self.resultDate
+////                    return memo
+//                }
+//            }()
+//
+//            memo.title = self.titleField.text
+//            memo.company = self.companyField.text
+//            memo.memoText = self.memoTextView.text
+//            memo.memoNum = self.memoNumLabel.text
+//            memo.memoDate = self.dateField.text
+//            memo.alertDate = self.resultDate
  
             // 上で作成したデータをデータベースに保存
-            (UIApplication.shared.delegate as! AppDelegate).saveContext()
+//            (UIApplication.shared.delegate as! AppDelegate).saveContext()
             self.presentingViewController?.presentingViewController?.dismiss(animated: true, completion: nil)
 //            self.dismiss(animated: true, completion: nil)
 
@@ -199,17 +199,17 @@ class ViewController: UIViewController, UITextFieldDelegate,UITextViewDelegate {
     //データを保存
     func saveContext () {
         
-        let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
-        if context.hasChanges {
-            do {
-                try context.save()
-                print(context)
-                
-            } catch {
-                let nserror = error as NSError
-                fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
-            }
-        }
+//        let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+//        if context.hasChanges {
+//            do {
+//                try context.save()
+//                print(context)
+//
+//            } catch {
+//                let nserror = error as NSError
+//                fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
+//            }
+//        }
     }
     
     func calcDate(day:Int ,hour:Int ,baseDate:Date ) -> Date {

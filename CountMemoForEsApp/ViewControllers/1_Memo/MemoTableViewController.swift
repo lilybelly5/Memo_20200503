@@ -14,7 +14,7 @@ class MemoTableViewController: UITableViewController, UINavigationControllerDele
     var memoData:[Memo] = []
     
     
-    let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+//    let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -38,26 +38,26 @@ class MemoTableViewController: UITableViewController, UINavigationControllerDele
     
     func getData() {
         // データ保存時と同様にcontextを定義
-        let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
-        do {
-            // CoreDataからデータをfetchしてtasksに格納
-            let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Memo")
-            fetchRequest.returnsObjectsAsFaults = false
-//            並び順を作成順に指定
-            fetchRequest.sortDescriptors = [
-                NSSortDescriptor(key: "createdAt", ascending: true)
-            ]
-            memoData = try context.fetch(fetchRequest) as! [Memo]
-
-            for i in 0..<memoData.count{
-                // Notification のインスタンス作成
-                let content = UNMutableNotificationContent()
-                
-                // タイトル、本文の設定
-                let titleTexr = memoData[i].company!
-                content.title = "\(String(describing: titleTexr))"
-                content.body = "エントリーシートの締め切りが迫っています。"
-             
+//        let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+//        do {
+//            // CoreDataからデータをfetchしてtasksに格納
+//            let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Memo")
+//            fetchRequest.returnsObjectsAsFaults = false
+////            並び順を作成順に指定
+//            fetchRequest.sortDescriptors = [
+//                NSSortDescriptor(key: "createdAt", ascending: true)
+//            ]
+//            memoData = try context.fetch(fetchRequest) as! [Memo]
+//
+//            for i in 0..<memoData.count{
+//                // Notification のインスタンス作成
+//                let content = UNMutableNotificationContent()
+//                
+//                // タイトル、本文の設定
+//                let titleTexr = memoData[i].company!
+//                content.title = "\(String(describing: titleTexr))"
+//                content.body = "エントリーシートの締め切りが迫っています。"
+//             
                 let date = memoData[i].alertDate
 
                 if let date = date{
@@ -69,12 +69,12 @@ class MemoTableViewController: UITableViewController, UINavigationControllerDele
                     //通知
                     UNUserNotificationCenter.current().add(request, withCompletionHandler: nil)
                 }
-            }
-            
-            return
-        } catch {
-            print("Fetching Failed.")
-        }
+//            }
+//            
+//            return
+//        } catch {
+//            print("Fetching Failed.")
+//        }
         
     }
     //セクションの数
@@ -113,21 +113,21 @@ class MemoTableViewController: UITableViewController, UINavigationControllerDele
         
         present(alert, animated: true, completion: nil)
     
-        let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
-
-         if editingStyle == .delete {
-
-            let deletedMemoData = memoData[indexPath.row]
-
-            context.delete(deletedMemoData)
-            memoData.remove(at: indexPath.row)
-            
-            // 削除したあとのデータを保存する
-            (UIApplication.shared.delegate as! AppDelegate).saveContext()
-            
-            // 削除後の全データをfetchする
-            getData()
-        }
+//        let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+//
+//         if editingStyle == .delete {
+//
+//            let deletedMemoData = memoData[indexPath.row]
+//
+//            context.delete(deletedMemoData)
+//            memoData.remove(at: indexPath.row)
+//
+//            // 削除したあとのデータを保存する
+//            (UIApplication.shared.delegate as! AppDelegate).saveContext()
+//
+//            // 削除後の全データをfetchする
+//            getData()
+//        }
         // taskTableViewを再読み込みする
         tableView.reloadData()
     }
@@ -157,8 +157,8 @@ class MemoTableViewController: UITableViewController, UINavigationControllerDele
             // NavigationControllerの一番目のViewControllerが次の画面
             let vc = nc.topViewController as! DetailViewController
             // contextをAddTaskViewController.swiftのcontextへ渡す
-            let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
-            vc.context = context
+//            let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+//            vc.context = context
  
             //indexPathがnilでないことを確認し、選択した行のデータを引きわたす
             

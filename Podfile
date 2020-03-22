@@ -16,12 +16,12 @@ target 'CountMemoForEsApp' do
   pod "PullToRefreshKit"
   pod 'SwiftyJSON'
 
-  pod 'Firebase/Auth'
-  pod 'Firebase/Core'
-  pod 'Firebase/Database'
-  pod 'Firebase/Firestore'
-  pod 'Firebase/Storage'
-  pod 'Firebase/Messaging'
+#  pod 'Firebase/Auth'
+#  pod 'Firebase/Core'
+#  pod 'Firebase/Database'
+#  pod 'Firebase/Firestore'
+#  pod 'Firebase/Storage'
+#  pod 'Firebase/Messaging'
 
 
   # Pods for CountMemoForEsApp

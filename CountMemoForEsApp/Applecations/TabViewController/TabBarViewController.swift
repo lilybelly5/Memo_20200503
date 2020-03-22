@@ -40,14 +40,14 @@ class TabBarViewController: UITabBarController , UITabBarControllerDelegate {
             verticalOffset = 20
         }
 
-        item1.image = UIImage(named: "setting@2x.png")?.withRenderingMode(.alwaysOriginal);
-        item1.imageInsets = UIEdgeInsets(top: CGFloat(topInset), left: 0, bottom: CGFloat(bottomInset), right: 0);
-        item2.image = UIImage(named: "setting@2x.png")?.withRenderingMode(.alwaysOriginal);
-        item2.imageInsets = UIEdgeInsets(top: CGFloat(topInset), left: 0, bottom: CGFloat(bottomInset), right: 0);
-        item3.image = UIImage(named: "setting@2x.png")?.withRenderingMode(.alwaysOriginal);
-        item3.imageInsets = UIEdgeInsets(top: CGFloat(topInset), left: 0, bottom: CGFloat(bottomInset), right: 0);
-        item4.image = UIImage(named: "setting@2x.png")?.withRenderingMode(.alwaysOriginal);
-        item4.imageInsets = UIEdgeInsets(top: CGFloat(topInset), left: 0, bottom: CGFloat(bottomInset), right: 0);
+        item1.image = UIImage(named: "navbar-edit@2x.png")?.withRenderingMode(.alwaysOriginal);
+        item1.imageInsets = UIEdgeInsets(top: CGFloat(3), left: 0, bottom: CGFloat(3), right: 0);
+        item2.image = UIImage(named: "ic_todo")?.withRenderingMode(.alwaysOriginal);
+        item2.imageInsets = UIEdgeInsets(top: CGFloat(topInset+10), left: 0, bottom: CGFloat(bottomInset+10), right: 0);
+        item3.image = UIImage(named: "ic_calendar")?.withRenderingMode(.alwaysOriginal);
+        item3.imageInsets = UIEdgeInsets(top: CGFloat(topInset+20), left: 0, bottom: CGFloat(bottomInset+20), right: 0);
+        item4.image = UIImage(named: "ic_account")?.withRenderingMode(.alwaysOriginal);
+        item4.imageInsets = UIEdgeInsets(top: CGFloat(topInset+3), left: 0, bottom: CGFloat(bottomInset+3), right: 0);
 
         item1.title = "ES Memo";
         item1.titlePositionAdjustment = UIOffset(horizontal: 0, vertical: CGFloat(verticalOffset));
@@ -58,10 +58,10 @@ class TabBarViewController: UITabBarController , UITabBarControllerDelegate {
         item4.title = "Account";
         item4.titlePositionAdjustment = UIOffset(horizontal: 0, vertical: CGFloat(verticalOffset));
 
-        item1.selectedImage = UIImage(named: "setting@2x.png")?.withRenderingMode(.alwaysOriginal);
-        item2.selectedImage = UIImage(named: "setting@2x.png")?.withRenderingMode(.alwaysOriginal);
-        item3.selectedImage = UIImage(named: "setting@2x.png")?.withRenderingMode(.alwaysOriginal);
-        item4.selectedImage = UIImage(named: "setting@2x.png")?.withRenderingMode(.alwaysOriginal);
+//        item1.selectedImage = UIImage(named: "setting@2x.png")?.withRenderingMode(.alwaysOriginal);
+//        item2.selectedImage = UIImage(named: "setting@2x.png")?.withRenderingMode(.alwaysOriginal);
+//        item3.selectedImage = UIImage(named: "setting@2x.png")?.withRenderingMode(.alwaysOriginal);
+//        item4.selectedImage = UIImage(named: "setting@2x.png")?.withRenderingMode(.alwaysOriginal);
 
         setNeedsStatusBarAppearanceUpdate();
     }

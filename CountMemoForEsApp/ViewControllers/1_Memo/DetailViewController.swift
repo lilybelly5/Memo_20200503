@@ -19,7 +19,7 @@ class DetailViewController: UIViewController {
     @IBOutlet var textData: UITextView!
     
     var detailData:Memo?
-    var context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+//    var context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
     
     var titleStr: String?
     var company: String?
@@ -62,8 +62,8 @@ class DetailViewController: UIViewController {
             // NavigationControllerの一番目のViewControllerが次の画面
             let vc = nc.topViewController as! ViewController
             // contextをAddTaskViewController.swiftのcontextへ渡す
-            let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
-            vc.context = context
+//            let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+//            vc.context = context
             
             vc.memo = self.detailData
 

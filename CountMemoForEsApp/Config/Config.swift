@@ -22,6 +22,13 @@ func BORDER_WIDTH() -> CGFloat{
 
 class Config {
     
+    static let MemoTypeData = ["北海道",
+    "青森県",
+    "岩手県",
+    "宮城県",
+    "秋田県"]
+    
+
     static let YES = "はい"
     static let NO = "いいえ"
     static let CANCEL = "キャンセル"

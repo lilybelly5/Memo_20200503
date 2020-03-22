@@ -19,7 +19,7 @@ class SearchTableViewController: UITableViewController, UISearchBarDelegate, UIS
         searchBar.delegate = self
 
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
-        let context = appDelegate.persistentContainer.viewContext
+//        let context = appDelegate.persistentContainer.viewContext
         let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "company")
   
     }
@@ -55,19 +55,19 @@ class SearchTableViewController: UITableViewController, UISearchBarDelegate, UIS
     }
 
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText:String) {
-        if(searchText != ""){
-            var predicate: NSPredicate = NSPredicate()
-            predicate = NSPredicate(format: "company contains[c] '\(searchText)'" )
-            let appDelegate = UIApplication.shared.delegate as! AppDelegate
-            let context = appDelegate.persistentContainer.viewContext
-            let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "company")
-            fetchRequest.predicate = predicate
-            do{
-                memoData = try context.fetch(fetchRequest) as! [Memo]
-            } catch {
-                print("Could not get search data.")
-            }
-        }
+//        if(searchText != ""){
+//            var predicate: NSPredicate = NSPredicate()
+//            predicate = NSPredicate(format: "company contains[c] '\(searchText)'" )
+//            let appDelegate = UIApplication.shared.delegate as! AppDelegate
+//            let context = appDelegate.persistentContainer.viewContext
+//            let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "company")
+//            fetchRequest.predicate = predicate
+//            do{
+//                memoData = try context.fetch(fetchRequest) as! [Memo]
+//            } catch {
+//                print("Could not get search data.")
+//            }
+//        }
         tableView.reloadData()
     }
 
