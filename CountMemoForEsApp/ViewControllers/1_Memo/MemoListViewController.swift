@@ -77,11 +77,11 @@ class MemoListViewController: UIViewController
 
     }
     
-    @objc func refreshBottom() {
-        if !updateFlag {
+//    @objc func refreshBottom() {
+//        if !updateFlag {
 //            updateData()
-        }
-    }
+//        }
+//    }
 
     override func viewWillAppear(_ animated: Bool) {
         self.tabBarController?.tabBar.isHidden = false
