@@ -13,7 +13,7 @@ class TopViewController: BaseViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         if #available(iOS 13.0, *) {
-            self.isModalInPresentation = false
+            //self.isModalInPresentation = false
         }
         // Do any additional setup after loading the view.
     }

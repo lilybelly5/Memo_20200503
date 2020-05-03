@@ -11,7 +11,8 @@ import UIKit
 class MemoViewController: UIViewController
 , UITableViewDelegate
 , UITableViewDataSource
-, UITextViewDelegate {
+, UITextViewDelegate
+, WWCalendarTimeSelectorProtocol {
 
     @IBOutlet weak var tableView: UITableView!
     
@@ -20,26 +21,19 @@ class MemoViewController: UIViewController
     @IBOutlet weak var mainView: UIView!
     @IBOutlet weak var actionBtn: UIButton!
     @IBOutlet weak var actionBtnHeight: NSLayoutConstraint!
-    @IBOutlet weak var dateLb: ScaledLabel!
-    @IBOutlet weak var memoNumLb: ScaledLabel!
-    @IBOutlet weak var memoTitleLb: ScaledLabel!
     
+    @IBOutlet weak var countLb: UILabel!
     @IBOutlet weak var companyLe: ScaleTextField!
     @IBOutlet weak var memoTitleLe: ScaleTextField!
     @IBOutlet weak var memoDateLe: ScaleTextField!
     @IBOutlet weak var memoContentTxt: ScaledTextView!
-    @IBOutlet weak var currentNumLb: ScaledLabel!
-    
-    @IBOutlet weak var topView: UIView!
-    @IBOutlet weak var topViewHeight: NSLayoutConstraint!
-    @IBOutlet weak var bottomView: UIView!
-    @IBOutlet weak var bottomViewHeight: NSLayoutConstraint!
-    @IBOutlet weak var cancelBtn: UIButton!
-    @IBOutlet weak var saveBtn: UIButton!
     
     internal var memo:Memo? = nil
     internal var editType:String = "new"
     
+    fileprivate var singleDate: Date = Date()
+    fileprivate var multipleDates: [Date] = []
+
     var editable:Bool = true
     var preContentTxt:String = ""
 
@@ -47,6 +41,8 @@ class MemoViewController: UIViewController
     var datePicker: UIDatePicker = UIDatePicker()
     //resultDateで１日前を日付計算
     var resultDate:Date?
+    
+    var currentMemoNum = 0
 
     
     override func viewDidLoad() {
@@ -56,58 +52,56 @@ class MemoViewController: UIViewController
         self.tableView.dataSource = self
         self.tableView.alwaysBounceVertical = false
         
+        
         self.actionBtn.layer.cornerRadius = 5
-        self.cancelBtn.layer.cornerRadius = 5
-        self.saveBtn.layer.cornerRadius = 5
-        self.mainView.layer.cornerRadius = 10
-        self.topView.layer.cornerRadius = 10
         Common.setBorderColor(view: self.memoContentTxt)
         
-        // ピッカー設定
-        datePicker.datePickerMode = UIDatePicker.Mode.dateAndTime
-        datePicker.timeZone = NSTimeZone.local
-        datePicker.locale = Locale(identifier: "ja")
-        memoDateLe.inputView = datePicker
+//        // ピッカー設定
+//        datePicker.datePickerMode = UIDatePicker.Mode.dateAndTime
+//        datePicker.timeZone = NSTimeZone.local
+//        datePicker.locale = Locale(identifier: "ja")
+//        memoDateLe.inputView = datePicker
         
         self.memoContentTxt.delegate = self
 
-        // 決定バーの生成
-        let toolbar = UIToolbar(frame: CGRect(x: 0, y: 0, width: view.frame.size.width, height: 35))
-        let spacelItem = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: self, action: nil)
-        let doneItem = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(doneBtn))
-        toolbar.setItems([spacelItem, doneItem], animated: true)
-        
-        // インプットビュー設定(紐づいているUITextfieldへ代入)
-        memoDateLe.inputView = datePicker
-        memoDateLe.inputAccessoryView = toolbar
+//        // 決定バーの生成
+//        let toolbar = UIToolbar(frame: CGRect(x: 0, y: 0, width: view.frame.size.width, height: 35))
+//        let spacelItem = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: self, action: nil)
+//        let doneItem = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(doneBtn))
+//        toolbar.setItems([spacelItem, doneItem], animated: true)
+//
+//        // インプットビュー設定(紐づいているUITextfieldへ代入)
+//        memoDateLe.inputView = datePicker
+//        memoDateLe.inputAccessoryView = toolbar
+
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy年MM月dd日 HH:mm"
+        formatter.amSymbol = "AM"
+        formatter.pmSymbol = "PM"
 
         if self.editType == "new" {
-            self.topViewHeight.constant = 0
             self.actionBtn.isHidden = true
             self.actionBtnHeight.constant = 0
-            self.bottomView.isHidden = false
-            self.bottomViewHeight.constant = 30
             self.editable = true
-            self.currentNumLb.text = "0"
-            self.companyLe.becomeFirstResponder()
+            self.memoTitleLe.becomeFirstResponder()
         }else {
             self.actionBtn.isHidden = false
             self.actionBtnHeight.constant = 30
-            self.bottomView.isHidden = true
-            self.bottomViewHeight.constant = 0
             self.editable = false
             
             if let memo:Memo = memo {
-                memoTitleLb.text = memo.title
-                memoNumLb.text = "文字数：" + memo.memoNum! + "字"
                 memoTitleLe.text = memo.title
                 companyLe.text = memo.company
                 memoContentTxt.text = memo.memoText
-                currentNumLb.text = memo.memoNum
                 memoDateLe.text = memo.memoDate
+                
+                let formatter = DateFormatter()
+                formatter.locale = NSLocale(localeIdentifier: "ja_JP") as Locale
+                formatter.dateFormat = "yyyy年MM月dd日HH時"
+                singleDate = formatter.date(from: memo.memoDate!)!
             }
-
         }
+        countLb.text = String(memoContentTxt.text.count)
         setEditingFeilds()
         
         addDoneButtonOnKeyboard()
@@ -130,12 +124,11 @@ class MemoViewController: UIViewController
         self.companyLe.isEnabled = self.editable
         self.memoTitleLe.isEnabled = self.editable
         self.memoDateLe.isEnabled = self.editable
-        
+        self.memoContentTxt.isEditable = self.editable
+
         if self.editable {
-            self.actionBtn.backgroundColor = .blue
             self.actionBtn.setTitle("完了", for: .normal)
         }else {
-            self.actionBtn.backgroundColor = .orange
             self.actionBtn.setTitle("編集", for: .normal)
         }
     }
@@ -174,7 +167,7 @@ class MemoViewController: UIViewController
 
             print(pickerTime)
             //前日,日本時間を設定
-            resultDate = calcDate(baseDate: pickerTime)
+            resultDate = Common.calcDate(baseDate: pickerTime)
         }
 
 
@@ -231,17 +224,46 @@ class MemoViewController: UIViewController
             self.memoContentTxt.text = preContentTxt
             return
         }
-        currentNumLb.text = String(numLabel)
+        currentMemoNum = numLabel
         preContentTxt = memoContentTxt.text
+        self.countLb.text = String(commentNum) + "文字"
     }
+    
+    func showCalendarSelecter() {
+        let selector = UIStoryboard(name: "WWCalendarTimeSelector", bundle: nil).instantiateInitialViewController() as! WWCalendarTimeSelector
+        selector.delegate = self
+        selector.optionCurrentDate = singleDate
+        selector.optionCurrentDates = Set(multipleDates)
+        selector.optionCurrentDateRange.setStartDate(multipleDates.first ?? singleDate)
+        selector.optionCurrentDateRange.setEndDate(multipleDates.last ?? singleDate)
 
-    func calcDate(baseDate:Date ) -> Date {
+        present(selector, animated: true, completion: nil)
+    }
+    
+    func WWCalendarTimeSelectorDone(_ selector: WWCalendarTimeSelector, date: Date) {
+        print("Selected \n\(date)\n---")
+        singleDate = date
+        // 日付のフォーマット
         let formatter = DateFormatter()
-        formatter.locale = NSLocale(localeIdentifier: "ja_JP") as Locale
-        formatter.dateFormat = "yyyy-MM-dd HH:mm"
-        let dateStr = formatter.string(from: baseDate)
-        formatter.timeZone = TimeZone(abbreviation: "UTC")
-        return formatter.date(from: dateStr)!
+        //"yyyy年MM月dd日"を"yyyy/MM/dd"したりして出力の仕方を好きに変更できる
+        formatter.dateFormat = "yyyy年MM月dd日HH時"
+        //datePickerで指定した日付が表示される
+        memoDateLe.text = "\(formatter.string(from: date))"
+        let pickerTime = date
+
+        print(pickerTime)
+        //前日,日本時間を設定
+        resultDate = Common.calcDate(baseDate: pickerTime)
+    }
+    
+    func WWCalendarTimeSelectorDone(_ selector: WWCalendarTimeSelector, dates: [Date]) {
+        print("Selected Multiple Dates \n\(dates)\n---")
+        if let date = dates.first {
+            singleDate = date
+        }
+        else {
+        }
+        multipleDates = dates
     }
 
     func checkEmptyFeild() -> Bool {
@@ -277,12 +299,8 @@ class MemoViewController: UIViewController
         }else {
             self.editable = !self.editable
             self.setEditingFeilds()
-            self.companyLe.becomeFirstResponder()
+            self.memoTitleLe.becomeFirstResponder()
         }
-    }
-    
-    @IBAction func saveBtnClicked(_ sender: Any) {
-        saveMemoData()
     }
     
     func saveMemoData() {
@@ -300,7 +318,7 @@ class MemoViewController: UIViewController
                     let okAction = UIAlertAction(title: "OK", style: .default) { (action) in
 
                         if self.editType != "new" {
-                            LocalNotificationManager.removeNotification(data: self.memo!)
+                            LocalNotificationManager.removeNotification(id: self.memo!.company!+self.memo!.title!)
                         }
                         // 編集の場合は詳細画面から渡されたself.memoを変更、
                         // 新規の場合は新しいMemoオブジェクトを作り、現在の日時を入れる_
@@ -320,14 +338,16 @@ class MemoViewController: UIViewController
                         memo.title = self.memoTitleLe.text
                         memo.company = self.companyLe.text
                         memo.memoText = self.memoContentTxt.text
-                        memo.memoNum = self.currentNumLb.text
                         memo.memoDate = self.memoDateLe.text
                         memo.alertDate = self.resultDate
-             
-                        // 上で作成したデータをデータベースに保存
-                        DatabaseManager.saveContext()
-                        LocalNotificationManager.addNotificaion(data: memo, time: (memo.alertDate?.timeIntervalSince(self.calcDate(baseDate: Date())))!)
-                        
+                        memo.memoNum = String(self.currentMemoNum)
+                        let timeInterval = memo.alertDate?.timeIntervalSince(Common.calcDate(baseDate: Date()))
+                        if timeInterval != nil {
+                            if timeInterval! > 0{
+                                DatabaseManager.saveContext()
+                                LocalNotificationManager.addNotificaion(title: memo.company!, id: memo.company!+memo.title!, time: timeInterval!)
+                            }
+                        }
                         //入力値をクリアにする
                         self.clearData()
                         self.navigationController?.popViewController(animated: true)
@@ -349,13 +369,17 @@ class MemoViewController: UIViewController
         companyLe.text = ""
         memoTitleLe.text = ""
         memoDateLe.text = ""
-        currentNumLb.text = "0"
         memoContentTxt.text = ""
     }
 
-    @IBAction func cancelBtnClicked(_ sender: Any) {
+    @IBAction func backBtnClicked(_ sender: Any) {
         self.navigationController?.popViewController(animated: true)
     }
-    
-    
+ 
+    @IBAction func timeBtnClicked(_ sender: Any) {
+        if editable {
+            showCalendarSelecter()
+        }
+    }
+
 }

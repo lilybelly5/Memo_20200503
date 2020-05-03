@@ -12,7 +12,6 @@ class LoginViewController: UIViewController {
 
     
     @IBOutlet weak var emailLe: UITextField!
-    @IBOutlet weak var avataImg: UIImageView!
     
     @IBOutlet weak var passwordLe: UITextField!
     
@@ -21,11 +20,6 @@ class LoginViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        self.avataImg.layer.cornerRadius = 10
-        if Common.me?.avata != "" {
-            self.avataImg.image = Common.loadImageFromDiskWith(fileName: Common.me!.avata)
-        }
-        
         addDoneButtonOnKeyboard()
     }
     
@@ -77,5 +71,8 @@ class LoginViewController: UIViewController {
         }
     }
     
-
+    @IBAction func backBtnClicked(_ sender: Any) {
+        dismiss(animated: true, completion: nil)
+    }
+    
 }

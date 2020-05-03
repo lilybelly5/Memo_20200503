@@ -11,11 +11,16 @@ import UIKit
 class MemoHeaderCollectionReusableView: UICollectionReusableView {
 
     @IBOutlet weak var titleLb: UILabel!
+    @IBOutlet weak var markBg: UIView!
     
     
     override func awakeFromNib() {
         super.awakeFromNib()
-        // Initialization code
+        markBg.layer.cornerRadius = 2
+    }
+    
+    internal func initData(markNum: Int, groupTitle: String) {
+        titleLb.text = groupTitle
     }
     
 }

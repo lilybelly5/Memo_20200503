@@ -1,10 +1,3 @@
-//
-//  MemoListViewController.swift
-//  CountMemoForEsApp
-//
-//  Created by ADV on 2020/03/21.
-//  Copyright © 2020 Yoko Ishikawa. All rights reserved.
-//
 
 import UIKit
 import SVProgressHUD
@@ -22,8 +15,10 @@ class MemoListViewController: UIViewController
     @IBOutlet weak var searchBar: UISearchBar!
     @IBOutlet weak var collectionView: UICollectionView!
     @IBOutlet weak var addBtnView: UIView!
-    @IBOutlet weak var editBtn: UIButton!
     
+    
+    @IBOutlet weak var colorback: UIImageView!
+    @IBOutlet weak var addImage: UIImageView!
     private var gPopupMaskBG: UIView?
     private var delegateObj: AppDelegate?
     private var loadingFlag: Bool = false
@@ -46,21 +41,20 @@ class MemoListViewController: UIViewController
         self.collectionView.delegate = self
         self.collectionView.dataSource = self
         
-        self.editBtn.layer.cornerRadius = 5
-        self.addBtnView.layer.cornerRadius = 25
+        self.addBtnView.layer.cornerRadius = 35
         self.addBtnView.layer.masksToBounds = false
         self.addBtnView.layer.shadowRadius = 4
         self.addBtnView.layer.shadowOpacity = 1
         self.addBtnView.layer.shadowColor = UIColor.gray.cgColor
         self.addBtnView.layer.shadowOffset = CGSize(width: 0 , height:2)
-
+        self.collectionView.backgroundColor = .white
         
         let layout = collectionView.collectionViewLayout as! UICollectionViewFlowLayout
         layout.minimumLineSpacing = 10
         layout.minimumInteritemSpacing = 10
         layout.sectionInset = UIEdgeInsets(top: 10, left: 10, bottom: 0, right: 10)
-        layout.itemSize = CGSize(width: Config.SCREEN_WIDTH/2-15, height: Config.SCREEN_WIDTH/2-15)
-        layout.headerReferenceSize = CGSize(width:0, height:50)
+        layout.itemSize = CGSize(width: Config.SCREEN_WIDTH/2-15, height: (Config.SCREEN_WIDTH/2-15)*1.3)
+        layout.headerReferenceSize = CGSize(width:0, height:40)
         layout.sectionHeadersPinToVisibleBounds = true
 
 //        let bottomRefreshController = UIRefreshControl()
@@ -72,21 +66,15 @@ class MemoListViewController: UIViewController
         deleteMemoList = NSMutableArray()
         groupedMemoList = NSMutableArray()
         groupKeyList = NSMutableArray()
-
         addDoneButtonOnKeyboard()
 
     }
-    
-//    @objc func refreshBottom() {
-//        if !updateFlag {
-//            updateData()
-//        }
-//    }
 
     override func viewWillAppear(_ animated: Bool) {
         self.tabBarController?.tabBar.isHidden = false
-
-        self.loadMemoData(key: self.searchBar.searchTextField.text!)
+//        self.loadMemoData(key: self.searchBar.searchTextField.text!)
+        self.loadMemoData(key: self.searchBar.text!)
+        
     }
     
     func loadMemoData(key: String) {
@@ -94,7 +82,7 @@ class MemoListViewController: UIViewController
         memoData = DatabaseManager.getSearchDatas(keyword: key)
         groupedMemoList.removeAllObjects()
         groupKeyList.removeAllObjects()
-        
+
         for i in 0 ..< memoData.count {
             if !groupKeyList.contains(memoData[i].company!) {
                 groupKeyList.add(memoData[i].company!)
@@ -112,6 +100,13 @@ class MemoListViewController: UIViewController
             groupedMemoList.add(memoItems)
         }
         self.collectionView.reloadData()
+        
+        if (memoData.count < 1){
+            self.collectionView.backgroundView = UIImageView(image: UIImage(named: "memoback"))
+        }else{
+           self.collectionView.backgroundView = UIImageView(image: UIImage(named: "backgoround1"))
+        }
+
     }
 
     func addDoneButtonOnKeyboard(){
@@ -144,7 +139,11 @@ class MemoListViewController: UIViewController
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell:MemoCollectionViewCell = collectionView.dequeueReusableCell(withReuseIdentifier: "MemoCollectionViewCell", for: indexPath) as! MemoCollectionViewCell;
         let memoDatas = self.groupedMemoList.object(at: indexPath.section) as! [Memo]
-        cell.initData(memoData: memoDatas[indexPath.row], section: indexPath.section, ind: indexPath.row, editable: self.editable)
+        var selected = false
+        if deleteMemoList.contains(memoDatas[indexPath.row]) {
+            selected = true
+        }
+        cell.initData(memoData: memoDatas[indexPath.row], section: indexPath.section, ind: indexPath.row, editable: selected)
         cell.delegate = self
         
         return cell;
@@ -155,14 +154,12 @@ class MemoListViewController: UIViewController
     }
 
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        if !editable {
-            let vc = MemoViewController()
-            vc.editType = "edit"
-            let memoDatas = self.groupedMemoList.object(at: indexPath.section) as! [Memo]
-            vc.memo = memoDatas[indexPath.row]
-            self.navigationController?.pushViewController(vc, animated: true)
-            self.tabBarController?.tabBar.isHidden = true
-        }
+        let vc = MemoViewController()
+        vc.editType = "edit"
+        let memoDatas = self.groupedMemoList.object(at: indexPath.section) as! [Memo]
+        vc.memo = memoDatas[indexPath.row]
+        self.navigationController?.pushViewController(vc, animated: true)
+        self.tabBarController?.tabBar.isHidden = true
     }
 
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
@@ -171,7 +168,7 @@ class MemoListViewController: UIViewController
         case UICollectionView.elementKindSectionHeader:
             let reusableview = collectionView.dequeueReusableSupplementaryView(ofKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "MemoHeaderCollectionReusableView", for: indexPath) as! MemoHeaderCollectionReusableView
 
-            reusableview.titleLb.text = (self.groupKeyList[indexPath.section] as! String)
+            reusableview.initData(markNum: indexPath.section+1, groupTitle: (self.groupKeyList[indexPath.section] as! String))
             return reusableview
         default:  fatalError("Unexpected element kind")
         }
@@ -184,6 +181,23 @@ class MemoListViewController: UIViewController
         }else {
             deleteMemoList.remove(memoDatas[ind])
         }
+        if deleteMemoList.count > 0 {
+            self.editable = true
+            self.addBtnView.backgroundColor = UIColor(hexString: "F9764D")
+            if #available(iOS 13.0, *) {
+                self.addImage.image = UIImage(contentsOfFile: "bin.xmark")
+            } else {
+                // Fallback on earlier versions
+            }
+        }else {
+            self.editable = false
+            self.addBtnView.backgroundColor = UIColor(hexString: "30C4A4")
+            if #available(iOS 13.0, *) {
+                self.addImage.image = UIImage(contentsOfFile: "plus")
+            } else {
+                // Fallback on earlier versions
+            }
+        }
     }
     
     func deleteSelectedDatas() {
@@ -192,22 +206,24 @@ class MemoListViewController: UIViewController
             // ボタンが押された時の処理を書く（クロージャ実装）
             (action: UIAlertAction!) -> Void in
             for i in 0 ..< self.deleteMemoList.count {
-                DatabaseManager.persistentContainer.viewContext.delete(self.deleteMemoList.object(at: i) as! Memo)
-                LocalNotificationManager.removeNotification(data: self.deleteMemoList.object(at: i) as! Memo)
+               let memo = self.deleteMemoList.object(at: i) as! Memo
+                DatabaseManager.persistentContainer.viewContext.delete(memo)
+                LocalNotificationManager.removeNotification(id: memo.company!+memo.title!)
             }
             self.editable = false
-            self.editBtn.setTitle("編集", for: .normal)
-            self.editBtn.setTitleColor(.systemBlue, for: .normal)
-            self.loadMemoData(key: self.searchBar.searchTextField.text!)
+            self.loadMemoData(key: self.searchBar.text!)
+            self.collectionView.reloadData()
+            self.deleteMemoList.removeAllObjects()
+            self.addBtnView.backgroundColor = UIColor(hexString: "30C4A4")
+            if #available(iOS 13.0, *) {
+                self.addImage.image = UIImage(contentsOfFile: "plus")
+            } else {
+                // Fallback on earlier versions
+            }
         })
         let cancelAction: UIAlertAction = UIAlertAction(title: "キャンセル", style: UIAlertAction.Style.cancel, handler:{
             // ボタンが押された時の処理を書く（クロージャ実装）
             (action: UIAlertAction!) -> Void in
-            self.editable = false
-            self.collectionView.reloadData()
-            self.editBtn.setTitle("編集", for: .normal)
-            self.editBtn.setTitleColor(.systemBlue, for: .normal)
-            self.deleteMemoList.removeAllObjects()
         })
         alert.addAction(cancelAction)
         alert.addAction(defaultAction)
@@ -217,30 +233,15 @@ class MemoListViewController: UIViewController
     
     
     @IBAction func addBtnClicked(_ sender: Any) {
-        let vc = MemoViewController()
-        vc.editType = "new"
-        self.navigationController?.pushViewController(vc, animated: true)
-        self.tabBarController?.tabBar.isHidden = true
-    }
-    
-    @IBAction func editBtnClicked(_ sender: Any) {
-        if !editable {
-            self.editBtn.setTitle("削除", for: .normal)
-            self.editBtn.setTitleColor(.red, for: .normal)
-            editable = !editable
-            deleteMemoList.removeAllObjects()
-            self.collectionView.reloadData()
+        if !self.editable {
+            let vc = NewESViewController()
+            self.navigationController?.pushViewController(vc, animated: true)
+            self.tabBarController?.tabBar.isHidden = true
         }else {
             if self.deleteMemoList.count > 0 {
                 deleteSelectedDatas()
-            }else {
-                self.editable = false
-                self.collectionView.reloadData()
-                self.editBtn.setTitle("編集", for: .normal)
-                self.editBtn.setTitleColor(.systemBlue, for: .normal)
             }
         }
     }
-    
     
 }

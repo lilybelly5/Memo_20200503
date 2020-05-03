@@ -84,4 +84,24 @@ class Common {
 
         return nil
     }
+    
+    static func getRandomColor(value: Int) -> UIColor{
+
+        let randomRed:CGFloat = CGFloat(255-value*40) / CGFloat(255)
+        let randomGreen:CGFloat = CGFloat(120+value*20) / CGFloat(255)
+        let randomBlue:CGFloat = CGFloat(30+value*10) / CGFloat(255)
+
+        return UIColor(red: randomRed, green: randomGreen, blue: randomBlue, alpha: 1.0)
+    }
+    
+    static func calcDate(baseDate:Date ) -> Date {
+        let formatter = DateFormatter()
+        formatter.locale = NSLocale(localeIdentifier: "ja_JP") as Locale
+        formatter.dateFormat = "yyyy-MM-dd HH:mm"
+        let dateStr = formatter.string(from: baseDate)
+        formatter.timeZone = TimeZone(abbreviation: "UTC")
+        return formatter.date(from: dateStr)!
+    }
+
+
 }

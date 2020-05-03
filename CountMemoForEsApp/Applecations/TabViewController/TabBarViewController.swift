@@ -14,22 +14,20 @@ class TabBarViewController: UITabBarController , UITabBarControllerDelegate {
         super.viewDidLoad()
         self.delegate = self;
 
-        UITabBar.appearance().tintColor = UIColor.white
+        UITabBar.appearance().tintColor = UIColor(hexString: "30C4A4")
         UITabBar.appearance().unselectedItemTintColor = UIColor.lightGray
-        UITabBar.appearance().barTintColor = UIColor.darkGray
+        UITabBar.appearance().barTintColor = UIColor.white
 
         var bottomSafeHeight : CGFloat = 0.0
 
-        if #available(iOS 11.0, *) {
-            let window = UIApplication.shared.keyWindow
-            bottomSafeHeight = (window?.safeAreaInsets.bottom)!
-        }
+//        if #available(iOS 11.0, *) {
+//            let window = UIApplication.shared.keyWindow
+//            bottomSafeHeight = (window?.safeAreaInsets.bottom)!
+//        }
         let item1 = self.tabBar.items![0] as UITabBarItem;
         let item2 = self.tabBar.items![1] as UITabBarItem;
         let item3 = self.tabBar.items![2] as UITabBarItem;
         let item4 = self.tabBar.items![3] as UITabBarItem;
-        
-        self.tabBar.tintColor = .white
         
         var topInset = 10
         var bottomInset = 10
@@ -40,28 +38,28 @@ class TabBarViewController: UITabBarController , UITabBarControllerDelegate {
             verticalOffset = 20
         }
 
-        item1.image = UIImage(named: "navbar-edit@2x.png")?.withRenderingMode(.alwaysOriginal);
-        item1.imageInsets = UIEdgeInsets(top: CGFloat(3), left: 0, bottom: CGFloat(3), right: 0);
+        item1.image = UIImage(named: "ic_home")?.withRenderingMode(.alwaysOriginal);
+//        item1.imageInsets = UIEdgeInsets(top: CGFloat(3), left: 0, bottom: CGFloat(3), right: 0);
         item2.image = UIImage(named: "ic_todo")?.withRenderingMode(.alwaysOriginal);
-        item2.imageInsets = UIEdgeInsets(top: CGFloat(topInset+10), left: 0, bottom: CGFloat(bottomInset+10), right: 0);
+//        item2.imageInsets = UIEdgeInsets(top: CGFloat(topInset+10), left: 0, bottom: CGFloat(bottomInset+10), right: 0);
         item3.image = UIImage(named: "ic_calendar")?.withRenderingMode(.alwaysOriginal);
-        item3.imageInsets = UIEdgeInsets(top: CGFloat(topInset+20), left: 0, bottom: CGFloat(bottomInset+20), right: 0);
+//        item3.imageInsets = UIEdgeInsets(top: CGFloat(topInset+18), left: 0, bottom: CGFloat(bottomInset+18), right: 0);
         item4.image = UIImage(named: "ic_account")?.withRenderingMode(.alwaysOriginal);
-        item4.imageInsets = UIEdgeInsets(top: CGFloat(topInset+3), left: 0, bottom: CGFloat(bottomInset+3), right: 0);
+//        item4.imageInsets = UIEdgeInsets(top: CGFloat(topInset+3), left: 0, bottom: CGFloat(bottomInset+3), right: 0);
 
-        item1.title = "ES Memo";
+        item1.title = "ホーム";
         item1.titlePositionAdjustment = UIOffset(horizontal: 0, vertical: CGFloat(verticalOffset));
-        item2.title = "TODO";
+        item2.title = "ToDo";
         item2.titlePositionAdjustment = UIOffset(horizontal: 0, vertical: CGFloat(verticalOffset));
-        item3.title = "Calendar";
+        item3.title = "カレンダー";
         item3.titlePositionAdjustment = UIOffset(horizontal: 0, vertical: CGFloat(verticalOffset));
-        item4.title = "Account";
+        item4.title = "アカウント";
         item4.titlePositionAdjustment = UIOffset(horizontal: 0, vertical: CGFloat(verticalOffset));
 
-//        item1.selectedImage = UIImage(named: "setting@2x.png")?.withRenderingMode(.alwaysOriginal);
-//        item2.selectedImage = UIImage(named: "setting@2x.png")?.withRenderingMode(.alwaysOriginal);
-//        item3.selectedImage = UIImage(named: "setting@2x.png")?.withRenderingMode(.alwaysOriginal);
-//        item4.selectedImage = UIImage(named: "setting@2x.png")?.withRenderingMode(.alwaysOriginal);
+        item1.selectedImage = UIImage(named: "ic_home_s")?.withRenderingMode(.alwaysOriginal);
+        item2.selectedImage = UIImage(named: "ic_todo_s")?.withRenderingMode(.alwaysOriginal);
+        item3.selectedImage = UIImage(named: "ic_calendar_s")?.withRenderingMode(.alwaysOriginal);
+        item4.selectedImage = UIImage(named: "ic_account_s")?.withRenderingMode(.alwaysOriginal);
 
         setNeedsStatusBarAppearanceUpdate();
     }

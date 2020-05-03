@@ -3,6 +3,7 @@
 
 platform :ios, '12.1'
 target 'CountMemoForEsApp' do
+project 'CountMemoForEsApp'
   # Comment the next line if you're not using Swift and don't want to use dynamic frameworks
 
   use_frameworks!
@@ -25,11 +26,5 @@ target 'CountMemoForEsApp' do
 
 
   # Pods for CountMemoForEsApp
-
-
-  target 'CountMemoForEsAppTests' do
-    inherit! :search_paths
-    # Pods for testing
-  end
 
 end

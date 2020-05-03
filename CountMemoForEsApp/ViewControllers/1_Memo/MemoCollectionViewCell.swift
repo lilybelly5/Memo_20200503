@@ -20,7 +20,6 @@ class MemoCollectionViewCell: UICollectionViewCell {
     @IBOutlet weak var titleLb: ScaledLabel!
     @IBOutlet weak var contentLb: ScaledLabel!
     @IBOutlet weak var dateLb: ScaledLabel!
-    @IBOutlet weak var conutBg: UIView!
     @IBOutlet weak var checkBtn: UIButton!
     @IBOutlet weak var checkImg: UIImageView!
     
@@ -28,7 +27,6 @@ class MemoCollectionViewCell: UICollectionViewCell {
 
     var currentIndex: Int?
     var currentSection: Int?
-    var editable: Bool = false
     var selectedFlag: Bool = false
     
     
@@ -42,13 +40,12 @@ class MemoCollectionViewCell: UICollectionViewCell {
         self.mainView.layer.shadowOpacity = 1
         self.mainView.layer.shadowColor = UIColor.gray.cgColor
         self.mainView.layer.shadowOffset = CGSize(width: 0 , height:2)
-        
-        self.conutBg.layer.cornerRadius = 10
     }
+    
     internal func initData(memoData: Memo, section: Int, ind: Int, editable: Bool) {
         self.currentIndex = ind
         self.currentSection = section
-        countLb.text = memoData.memoNum! + "文字"
+        countLb.text = memoData.memoNum! + " 文字"
         titleLb.text = memoData.title
         contentLb.text = memoData.memoText
         
@@ -61,10 +58,12 @@ class MemoCollectionViewCell: UICollectionViewCell {
 
         dateLb.text = formatter.string(from: date!)
         
-        checkImg.isHidden = !editable
-        checkBtn.isHidden = !editable
-        self.editable = editable
-        self.selectedFlag = false
+        self.selectedFlag = editable
+        if selectedFlag {
+            checkImg.image = UIImage(named: "check")
+        }else {
+            checkImg.image = UIImage(named: "uncheck")
+        }
     }
     
     @IBAction func checkBtnClicked(_ sender: Any) {

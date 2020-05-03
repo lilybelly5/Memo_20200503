@@ -7,10 +7,15 @@
 //
 
 import UIKit
+import UserNotifications
+import NotificationCenter
 
 class LocalNotificationManager: NSObject {
 
-    static func addNotificaion(data: Memo, time: TimeInterval) {
+    static func addNotificaion(title: String, id: String, time: TimeInterval) {
+        if time <= 0 {
+            return
+        }
         let delegateObj = AppDelegate.instance();
         // Notification のインスタンス作成
         let content = UNMutableNotificationContent() // Содержимое уведомления
@@ -18,21 +23,38 @@ class LocalNotificationManager: NSObject {
         let categoryIdentifire = "Delete Notification Type"
         
         // タイトル、本文の設定
-        let titleText = data.company!
+        let titleText = title
         content.title = "\(String(describing: titleText))"
         content.body = "エントリーシートの締め切りが迫っています。"
         content.sound = UNNotificationSound.default
         content.badge = 1
         content.categoryIdentifier = categoryIdentifire
 
-        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: time, repeats: false)
-        //リクエストの設定
-        let request = UNNotificationRequest.init(identifier: titleText + data.title!, content: content, trigger: trigger)
-        //通知
-        delegateObj.notificationCenter.add(request) { (error) in
-            if let error = error {
-                print("Error \(error.localizedDescription)")
+        let oneDayTime = time - 86400
+        if oneDayTime > 0 {
+            let trigger = UNTimeIntervalNotificationTrigger(timeInterval: time-86400, repeats: false)
+            //リクエストの設定
+            let request = UNNotificationRequest.init(identifier: id, content: content, trigger: trigger)
+            //通知
+            delegateObj.notificationCenter.add(request) { (error) in
+                if let error = error {
+                    print("Error \(error.localizedDescription)")
+                }
             }
+        }
+        
+        let threeDayTime = time-86400*3
+        if threeDayTime>0{
+            let trigger1 = UNTimeIntervalNotificationTrigger(timeInterval: time-86400*3, repeats: false)
+            //リクエストの設定
+            let request1 = UNNotificationRequest.init(identifier: id, content: content, trigger: trigger1)
+            //通知
+            delegateObj.notificationCenter.add(request1) { (error) in
+                if let error = error {
+                    print("Error \(error.localizedDescription)")
+                }
+            }
+                
         }
         let snoozeAction = UNNotificationAction(identifier: "Snooze", title: "Snooze", options: [])
         let deleteAction = UNNotificationAction(identifier: "DeleteAction", title: "Delete", options: [.destructive])
@@ -44,9 +66,9 @@ class LocalNotificationManager: NSObject {
         delegateObj.notificationCenter.setNotificationCategories([category])
     }
     
-    static func removeNotification(data: Memo) {
+    static func removeNotification(id: String) {
         let center = UNUserNotificationCenter.current()
-        center.removePendingNotificationRequests(withIdentifiers: [data.company! + data.title!])
-        center.removeDeliveredNotifications(withIdentifiers: [data.company! + data.title!])
+        center.removePendingNotificationRequests(withIdentifiers: [id])
+        center.removeDeliveredNotifications(withIdentifiers: [id])
     }
 }

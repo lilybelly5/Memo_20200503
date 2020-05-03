@@ -13,30 +13,38 @@ class AccountViewController: UIViewController
 , UIPickerViewDataSource
 , UITableViewDelegate
 , UITableViewDataSource
+, UITextViewDelegate
 , UIImagePickerControllerDelegate
 , UINavigationControllerDelegate
+, WWCalendarTimeSelectorProtocol
 {
-    
+    internal var users:UserProfile? = nil
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet var tableViewCell: UITableViewCell!
-    @IBOutlet weak var avataImg: UIImageView!
+    //@IBOutlet weak var avataImg: UIImageView!
     
+    @IBOutlet weak var yearText: UITextView!
+    
+    @IBOutlet weak var threeText: UITextView!
+    @IBOutlet weak var seconText: UITextView!
     @IBOutlet weak var memoTypeLe: UITextField!
     
+    @IBOutlet weak var endle: UITextField!
     @IBOutlet weak var userNameLe: UITextField!
     
     @IBOutlet weak var emailLe: UITextField!
     
     @IBOutlet weak var passwordLe1: UITextField!
+    
+    fileprivate var singleDate: Date = Date()
+    fileprivate var multipleDates: [Date] = []
 
-    @IBOutlet weak var editBtn: UIButton!
-    @IBOutlet weak var saveBtn: UIButton!
+    //@IBOutlet weak var editBtn: UIButton!
+    //@IBOutlet weak var saveBtn: UIButton!
     
     
     private var selectedTypeIndex: Int = 0
-    private var userImg: UIImage!
     private var editable: Bool = false
-
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -45,13 +53,29 @@ class AccountViewController: UIViewController
         self.tableView.delegate = self
         self.tableView.dataSource = self
         self.tableView.alwaysBounceVertical = false
-
-        self.avataImg.layer.cornerRadius = 10
-        self.editBtn.layer.cornerRadius = 5
-        self.saveBtn.layer.cornerRadius = 5
-
-        userImg = nil
-
+        
+        var user:[UserProfile] = []
+        user = DatabaseManager.getUseroDatas()
+        if(user.count < 1){
+            userNameLe.text = ""
+                   memoTypeLe.text = ""
+                   yearText.text = ""
+                   seconText.text = ""
+                   threeText.text = ""
+        }else{
+        userNameLe.text = user[user.count-1].username
+        memoTypeLe.text = user[user.count-1].graduateYear
+        yearText.text = user[user.count-1].education
+        seconText.text = user[user.count-1].qualification
+        threeText.text = user[user.count-1].hobby
+            
+        }
+        
+//        userNameLe.text = todoItems
+//        memoTypeLe.text = users?.graduateYear
+//        yearText.text = users?.education
+//        seconText.text = users?.qualification
+//        threeText.text = users?.hobby
         addDoneButtonOnKeyboard()
     }
     
@@ -63,10 +87,10 @@ class AccountViewController: UIViewController
             memoTypeLe.text = Config.MemoTypeData[Common.me!.memoType]
             userNameLe.text = Common.me!.userName
             emailLe.text = Common.me!.email
-            if Common.me!.avata != "" {
-                userImg = Common.loadImageFromDiskWith(fileName: Common.me!.avata)
-                avataImg.image = userImg
-            }
+//            if Common.me!.avata != "" {
+//                userImg = Common.loadImageFromDiskWith(fileName: Common.me!.avata)
+//                avataImg.image = userImg
+//            }
         }
         setEditingFeilds()
         
@@ -81,13 +105,24 @@ class AccountViewController: UIViewController
         self.passwordLe1.isEnabled = self.editable
 
         if self.editable {
-            editBtn.isHidden = true
-            saveBtn.isHidden = false
-            passwordLe1.isHidden = false
+            //editBtn.isHidden = true
+            //saveBtn.isHidden = false
+//            passwordLe1.isHidden = false
+//            endle.isHidden = false
+//            emailLe.isHidden = false
+            yearText.isEditable = true
+            threeText.isEditable = true
+            seconText.isEditable = true
         }else {
-            editBtn.isHidden = false
-            saveBtn.isHidden = true
-            passwordLe1.isHidden = true
+            //editBtn.isHidden = false
+            //saveBtn.isHidden = true
+//            passwordLe1.isHidden = true
+//            endle.isHidden = true
+//            emailLe.isHidden = true
+            yearText.isEditable = false
+            threeText.isEditable = false
+            seconText.isEditable = false
+            
         }
     }
 
@@ -110,7 +145,9 @@ class AccountViewController: UIViewController
 
         self.userNameLe.inputAccessoryView = doneToolbar
         self.emailLe.inputAccessoryView = doneToolbar
-        self.passwordLe1.inputAccessoryView = doneToolbar
+        self.yearText.inputAccessoryView = doneToolbar
+        self.seconText.inputAccessoryView = doneToolbar
+        self.threeText.inputAccessoryView = doneToolbar
     }
     
     @objc func keyboardWillShow(notification:NSNotification){
@@ -132,7 +169,9 @@ class AccountViewController: UIViewController
     @objc func doneButtonAction(){
         self.userNameLe.resignFirstResponder()
         self.emailLe.resignFirstResponder()
-        self.passwordLe1.resignFirstResponder()
+        self.yearText.resignFirstResponder()
+        self.seconText.resignFirstResponder()
+        self.threeText.resignFirstResponder()
     }
 
     
@@ -173,12 +212,7 @@ class AccountViewController: UIViewController
     func checkEmptyFeild() -> Bool {
         
         if self.memoTypeLe.text == "" {
-            Common.showErrorAlert(vc: self, title: Config.INPUT_ERR_TITLE, message: "Memo Type"+Config.INPUT_ERR_MSG)
-            return false
-        }
-        
-        if self.emailLe.text == "" || !(self.emailLe.text?.contains("@"))! {
-            Common.showErrorAlert(vc: self, title: Config.INPUT_ERR_TITLE, message: "メールアドレス"+Config.INPUT_ERR_MSG)
+            Common.showErrorAlert(vc: self, title: Config.INPUT_ERR_TITLE, message: "卒業年度"+Config.INPUT_ERR_MSG)
             return false
         }
         
@@ -187,8 +221,18 @@ class AccountViewController: UIViewController
             return false
         }
         
-        if self.passwordLe1.text == "" {
-            Common.showErrorAlert(vc: self, title: Config.INPUT_ERR_TITLE, message: "パスワード"+Config.INPUT_ERR_MSG)
+        if self.yearText.text == "" {
+            Common.showErrorAlert(vc: self, title: Config.INPUT_ERR_TITLE, message: "学歴職歴"+Config.INPUT_ERR_MSG)
+            return false
+        }
+        
+        if self.threeText.text == "" {
+            Common.showErrorAlert(vc: self, title: Config.INPUT_ERR_TITLE, message: "資格免許"+Config.INPUT_ERR_MSG)
+            return false
+        }
+        
+        if self.seconText.text == "" {
+            Common.showErrorAlert(vc: self, title: Config.INPUT_ERR_TITLE, message: "趣味特技"+Config.INPUT_ERR_MSG)
             return false
         }
         
@@ -203,79 +247,142 @@ class AccountViewController: UIViewController
         pickerView.dataSource = self
         pickerView.selectRow(selectedTypeIndex, inComponent: 0, animated: false)
         vc.view.addSubview(pickerView)
-        let editRadiusAlert = UIAlertController(title: "MemoTypeを選択してください。", message: nil, preferredStyle: .actionSheet)
+        let editRadiusAlert = UIAlertController(title: "卒業年度", message: nil, preferredStyle: .actionSheet)
         editRadiusAlert.setValue(vc, forKey: "contentViewController")
         editRadiusAlert.addAction(UIAlertAction(title: "Done", style: .default, handler: {
             (action: UIAlertAction!) -> Void in
             editRadiusAlert.dismiss(animated: true, completion: nil)
         }))
         present(editRadiusAlert, animated: true, completion: nil)
+//        let selector = UIStoryboard(name: "WWCalendarTimeSelector", bundle: nil).instantiateInitialViewController() as! WWCalendarTimeSelector
+//                   selector.delegate = self
+//                   selector.optionCurrentDate = singleDate
+//                   selector.optionCurrentDates = Set(multipleDates)
+//                   selector.optionCurrentDateRange.setStartDate(multipleDates.first ?? singleDate)
+//                   selector.optionCurrentDateRange.setEndDate(multipleDates.last ?? singleDate)
+//
+//                   present(selector, animated: true, completion: nil)
+//               }
+//               
+//               func WWCalendarTimeSelectorDone(_ selector: WWCalendarTimeSelector, date: Date) {
+//                   print("Selected \n\(date)\n---")
+//                   singleDate = date
+//                   // 日付のフォーマット
+//                   let formatter = DateFormatter()
+//                   //"yyyy年MM月dd日"を"yyyy/MM/dd"したりして出力の仕方を好きに変更できる
+//                   formatter.dateFormat = "yyyy年MM月dd日"
+//                   //datePickerで指定した日付が表示される
+//                   memoTypeLe.text = "\(formatter.string(from: date))"
+//               }
+//               
+//               func WWCalendarTimeSelectorDone(_ selector: WWCalendarTimeSelector, dates: [Date]) {
+//                   print("Selected Multiple Dates \n\(dates)\n---")
+//                   if let date = dates.first {
+//                       singleDate = date
+//                   }
+//                   else {
+//                   }
+//                   multipleDates = dates
     }
     
     @IBAction func registerBtnClicked(_ sender: Any) {
         if checkEmptyFeild() {
-            let userInfo = UserModel()
-            userInfo.memoType = selectedTypeIndex
-            userInfo.userName = userNameLe.text!
-            if userImg != nil {
-                Common.saveImage(imageName: "avata.png", image: userImg)
-                userInfo.avata = "avata.png"
-            }else {
-                userInfo.avata = ""
+            let alert: UIAlertController = UIAlertController(title: "確認", message: "作業を完了しましたか？", preferredStyle:  UIAlertController.Style.alert)
+            let cancelAction: UIAlertAction = UIAlertAction(title: "キャンセル", style: UIAlertAction.Style.cancel, handler:{
+                // ボタンが押された時の処理を書く（クロージャ実装）
+                (action: UIAlertAction!) -> Void in
+                self.navigationController?.popViewController(animated: true)
+            })
+                // OKボタン押下時のイベント
+              
+            let okAction = UIAlertAction(title: "OK", style: .default) {
+                (action) in
+            let users: UserProfile = {
+                if let users = self.users {
+                    users.graduateYear = self.memoTypeLe.text
+                    return users
+                } else {
+                    let users = UserProfile(context: DatabaseManager.persistentContainer.viewContext)
+                    return users
+                }
+            }()
+                users.username = self.userNameLe.text
+                users.graduateYear = self.memoTypeLe.text
+                users.education = self.yearText.text
+                users.qualification = self.seconText.text
+                users.hobby = self.threeText.text
+                
+                let storyboard = UIStoryboard(name: "Main", bundle: nil)
+                let delegateObj = AppDelegate.instance();
+                let vc: UIViewController = storyboard.instantiateViewController(withIdentifier: "homepage") as UIViewController
+                vc.modalPresentationStyle = .fullScreen
+                delegateObj.window?.rootViewController!.present(vc, animated: true, completion: {
+                })
+                DatabaseManager.saveContext()
+                self.editable = !self.editable
+                self.setEditingFeilds()
+                self.navigationController?.pushViewController(vc, animated: true)
+                self.tabBarController?.tabBar.isHidden = false
+
             }
-            userInfo.email = emailLe.text!
-            userInfo.password = passwordLe1.text!
-            
-            LocalstorageManager.setLoginInfo(info: userInfo)
-            Common.me = userInfo
-            
-            editable = !editable
-            setEditingFeilds()
-        }
-    }
-    
-    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
-        picker.dismiss(animated: true)
+                        
+                alert.dismiss(animated: true, completion: nil)
 
-        guard let image = info[.editedImage] as? UIImage else {
-            return
+                // UIAlertControllerにActionを追加
+                alert.addAction(cancelAction)
+                alert.addAction(okAction)
+                
+                // Alertを表示
+                present(alert, animated: true, completion: nil)
+                
+            }
         }
-        self.avataImg.image = image
-        self.userImg = image
-    }
-
-    @IBAction func editBtnClicked(_ sender: Any) {
-        editable = !editable
-        setEditingFeilds()
-    }
     
-    @IBAction func avataBtnClicked(_ sender: Any) {
-        let alert: UIAlertController = UIAlertController(title: "画像の選択",
-                                                         message: "",
-                                                         preferredStyle: .actionSheet);
-        let registerAction: UIAlertAction = UIAlertAction(title: "写真を撮影", style: .default, handler: {
-            (action: UIAlertAction!) -> Void in
-            let vc = UIImagePickerController()
-            vc.sourceType = .camera
-            vc.allowsEditing = true
-            vc.delegate = self
-            self.present(vc, animated: true)
-        })
-        let loginAction: UIAlertAction = UIAlertAction(title: "アルバムから選択", style: .default, handler: {
-            (action: UIAlertAction!) -> Void in
-            let vc = UIImagePickerController()
-            vc.sourceType = .photoLibrary
-            vc.allowsEditing = true
-            vc.delegate = self
-            self.present(vc, animated: true)
-        })
-        let cancelAction: UIAlertAction = UIAlertAction(title: "キャンセル",
-                                                        style: .cancel,
-                                                        handler: nil)
-        alert.addAction(registerAction)
-        alert.addAction(loginAction)
-        alert.addAction(cancelAction)
-        present(alert, animated: true, completion: nil)
+     @IBAction func avataBtnClicked(_ sender: Any) {
+            if editable {
+                let alert: UIAlertController = UIAlertController(title: "画像の選択",
+                                                                 message: "",
+                                                                 preferredStyle: .actionSheet);
+                let registerAction: UIAlertAction = UIAlertAction(title: "写真を撮影", style: .default, handler: {
+                    (action: UIAlertAction!) -> Void in
+                    let vc = UIImagePickerController()
+                    vc.sourceType = .camera
+                    vc.allowsEditing = true
+                    vc.delegate = self
+                    self.present(vc, animated: true)
+                })
+                let loginAction: UIAlertAction = UIAlertAction(title: "アルバムから選択", style: .default, handler: {
+                    (action: UIAlertAction!) -> Void in
+                    let vc = UIImagePickerController()
+                    vc.sourceType = .photoLibrary
+                    vc.allowsEditing = true
+                    vc.delegate = self
+                    self.present(vc, animated: true)
+                })
+                let cancelAction: UIAlertAction = UIAlertAction(title: "キャンセル",
+                                                                style: .cancel,
+                                                                handler: nil)
+                alert.addAction(registerAction)
+                alert.addAction(loginAction)
+                alert.addAction(cancelAction)
+                present(alert, animated: true, completion: nil)
+            }
     }
     
 }
+    
+//    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+//        picker.dismiss(animated: true)
+//
+//        guard let image = info[.editedImage] as? UIImage else {
+//            return
+//        }
+//        //self.avataImg.image = image
+//        self.userImg = image
+//    }
+
+
+   
+
+
+

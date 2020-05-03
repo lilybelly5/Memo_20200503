@@ -15,12 +15,12 @@ class RegisterViewController: UIViewController
 , UITableViewDataSource
 , UIImagePickerControllerDelegate
 , UINavigationControllerDelegate
+, WWCalendarTimeSelectorProtocol
 {
     
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet var tableViewCell: UITableViewCell!
-    @IBOutlet weak var avataImg: UIImageView!
-    
+
     @IBOutlet weak var memoTypeLe: UITextField!
     
     @IBOutlet weak var userNameLe: UITextField!
@@ -34,7 +34,9 @@ class RegisterViewController: UIViewController
     private var selectedTypeIndex: Int = 0
     private var userImg: UIImage!
 
-    
+    fileprivate var singleDate: Date = Date()
+    fileprivate var multipleDates: [Date] = []
+
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -42,7 +44,6 @@ class RegisterViewController: UIViewController
         self.tableView.dataSource = self
         self.tableView.alwaysBounceVertical = false
         
-        self.avataImg.layer.cornerRadius = 10
 
         userImg = nil
 
@@ -115,7 +116,7 @@ class RegisterViewController: UIViewController
     }
 
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return SCALE(value: 600)
+        return 600
     }
 
     func numberOfComponents(in pickerView: UIPickerView) -> Int {
@@ -147,16 +148,16 @@ class RegisterViewController: UIViewController
             return false
         }
         
-        if self.userNameLe.text == "" {
+        if self.userNameLe.text == ""{
             Common.showErrorAlert(vc: self, title: Config.INPUT_ERR_TITLE, message: "アカウント名"+Config.INPUT_ERR_MSG)
             return false
         }
         
-        if self.passwordLe1.text == "" {
+        if self.passwordLe1.text == "" || self.passwordLe1.text!.count < 8 {
             Common.showErrorAlert(vc: self, title: Config.INPUT_ERR_TITLE, message: "パスワード"+Config.INPUT_ERR_MSG)
             return false
         }else {
-            if self.passwordLe2.text == "" {
+            if self.passwordLe2.text == "" || self.passwordLe2.text!.count < 8 {
                 Common.showErrorAlert(vc: self, title: Config.INPUT_ERR_TITLE, message: "パスワード（確認）"+Config.INPUT_ERR_MSG)
                 return false
             }else {
@@ -171,22 +172,37 @@ class RegisterViewController: UIViewController
     }
 
     @IBAction func memoTypeBtnClicked(_ sender: Any) {
-        let vc = UIViewController()
-        vc.preferredContentSize = CGSize(width: Config.SCREEN_WIDTH,height: 150)
-        let pickerView = UIPickerView(frame: CGRect(x: 0, y: 0, width: Config.SCREEN_WIDTH, height: 150))
-        pickerView.delegate = self
-        pickerView.dataSource = self
-        pickerView.selectRow(selectedTypeIndex, inComponent: 0, animated: false)
-        vc.view.addSubview(pickerView)
-        let editRadiusAlert = UIAlertController(title: "MemoTypeを選択してください。", message: nil, preferredStyle: .actionSheet)
-        editRadiusAlert.setValue(vc, forKey: "contentViewController")
-        editRadiusAlert.addAction(UIAlertAction(title: "Done", style: .default, handler: {
-            (action: UIAlertAction!) -> Void in
-            editRadiusAlert.dismiss(animated: true, completion: nil)
-        }))
-        present(editRadiusAlert, animated: true, completion: nil)
-    }
-    
+            let selector = UIStoryboard(name: "WWCalendarTimeSelector", bundle: nil).instantiateInitialViewController() as! WWCalendarTimeSelector
+            selector.delegate = self
+            selector.optionCurrentDate = singleDate
+            selector.optionCurrentDates = Set(multipleDates)
+            selector.optionCurrentDateRange.setStartDate(multipleDates.first ?? singleDate)
+            selector.optionCurrentDateRange.setEndDate(multipleDates.last ?? singleDate)
+
+            present(selector, animated: true, completion: nil)
+        }
+        
+        func WWCalendarTimeSelectorDone(_ selector: WWCalendarTimeSelector, date: Date) {
+            print("Selected \n\(date)\n---")
+            singleDate = date
+            // 日付のフォーマット
+            let formatter = DateFormatter()
+            //"yyyy年MM月dd日"を"yyyy/MM/dd"したりして出力の仕方を好きに変更できる
+            formatter.dateFormat = "yyyy年MM月dd日"
+            //datePickerで指定した日付が表示される
+            memoTypeLe.text = "\(formatter.string(from: date))"
+        }
+        
+        func WWCalendarTimeSelectorDone(_ selector: WWCalendarTimeSelector, dates: [Date]) {
+            print("Selected Multiple Dates \n\(dates)\n---")
+            if let date = dates.first {
+                singleDate = date
+            }
+            else {
+            }
+            multipleDates = dates
+        }
+
     @IBAction func registerBtnClicked(_ sender: Any) {
         if checkEmptyFeild() {
             let userInfo = UserModel()
@@ -208,7 +224,7 @@ class RegisterViewController: UIViewController
                 let storyboard = UIStoryboard(name: "Main", bundle: nil)
                 let delegateObj = AppDelegate.instance();
                 DispatchQueue.main.async {
-                            let vc: UIViewController = storyboard.instantiateViewController(withIdentifier: "mainView") as UIViewController
+                            let vc: UIViewController = storyboard.instantiateViewController(withIdentifier: "loginView") as UIViewController
                             vc.modalPresentationStyle = .fullScreen
                             delegateObj.window?.rootViewController!.present(vc, animated: true, completion: {
                             })
@@ -223,7 +239,7 @@ class RegisterViewController: UIViewController
         guard let image = info[.editedImage] as? UIImage else {
             return
         }
-        self.avataImg.image = image
+//        self.avataImg.image = image
         self.userImg = image
     }
 
@@ -256,5 +272,11 @@ class RegisterViewController: UIViewController
         alert.addAction(cancelAction)
         present(alert, animated: true, completion: nil)
     }
+    
+    @IBAction func backBtnClicked(_ sender: Any) {
+        self.dismiss(animated: true) {
+        }
+    }
+    
     
 }

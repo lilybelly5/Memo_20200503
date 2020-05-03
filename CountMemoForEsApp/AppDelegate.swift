@@ -1,9 +1,6 @@
-//
-//  AppDelegate.swift
-//  CountMemoForEsApp
-//
-//  Copyright © 2019年 Yoko Ishikawa. All rights reserved.
-//
+//UDID；00008030-001C49183480802E
+//アカウント名　lilybell.5555@gmail.com
+//パスワード　　4lilYbell5
 
 import UIKit
 import UserNotifications
